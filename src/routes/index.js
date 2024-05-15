@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use('/auth', authRoutes);
 
-router.use('/files', filesRoutes);
+router.use('/files', fileRoutes);
 
 module.exports = router;
 

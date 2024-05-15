@@ -14,17 +14,6 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-// connectDB()
-//   .then(() => {
-//     app.listen(PORT, () => {
-//       console.log(`Server is running on port ${PORT}`);
-//     });
-//   })
-//   .catch((error) => {
-//     console.error('Failed to connect to MongoDB:', error);
-//   });
-
-
 
 // Connecting mongoDB.
 connectDB()
@@ -32,6 +21,12 @@ connectDB()
 
 // Routing.
 app.use('/api',routes);
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  });
+  
 
 // Run the server.
 app.listen(PORT, () => {

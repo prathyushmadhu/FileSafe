@@ -14,8 +14,8 @@ const encryptFile = (fileData, encryptionKey) => {
 const decryptFile = (encryptedData, encryptionKey) => {
     try {
         const decryptedData = CryptoJS.AES.decrypt(encryptedData, encryptionKey)
-        const decryptedBuffer = Bufer.from(decryptedData.toString(CryptoJS.enc.Utf8), 'base64');
-        return decryptedBuffer;
+        const decryptedString = decryptedData.toString(CryptoJS.enc.Utf8);
+        return decryptedString;
     } catch (error) {
         console.error('Error in decryption: ',error);
         throw error;

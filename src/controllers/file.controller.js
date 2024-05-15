@@ -1,17 +1,6 @@
-const multer = require('multer');
-const path = require('path');
-const {encryptFile} = require('../utils/crypto')
+const {encryptFile, decryptFile} = require('../utils/crypto');
+const File = require('../models/file.model');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-});
-
-const upload = multer({ storage: storage});
 
 const uploadFile = async (req, res) => {
     try {
@@ -19,8 +8,18 @@ const uploadFile = async (req, res) => {
             return res.status(400).json({error: "No file uploaded"});
         }
 
-        const AES_KEY = process.env.AES_KEY;
-        const encryptedData = encryptFile(req.file.buffer, 'encryptionKey')
+        const encryptedData = encryptFile(req.file.buffer, process.env.AES_KEY);
+        const userId = req.userId;
+        const file = new File({
+            filename: req.file.originalname,
+            size: req.file.size,
+            type: req.file.mimetype,
+            owner: userId,
+            data: encryptedData
+        });
+
+        await file.save();
+
         res.status(200).json({message: 'File uploaded successfully'});
     } catch (error) {
         console.error('Error in uploadFile: ',error);
@@ -31,7 +30,7 @@ const uploadFile = async (req, res) => {
 // To list the files.
 const listFiles = async (req, res) => {
     try {
-        const files = await File.find();
+        const files = await File.find({owner: req.userId});
         res.status(200).json(files);
     } catch (error) {
         console.error('Error in listFiles: ',error);
@@ -40,10 +39,14 @@ const listFiles = async (req, res) => {
 };
 
 // To download the files.
-const downloadFile = async (req, res) => {
+const fetchFile = async (req, res) => {
     try {
-        const file = await File.findById(req.params.id);
-        res.status(200).sendFile(file.path);
+        const file = await File.findOne({_id: req.params.id, owner: req.userId});
+        if (!file) {
+            return res.status(404).json({error: 'File not found'});
+        }
+        const decryptedData = decryptFile(file.data, process.env.AES_KEY);
+        res.status(200).send(decryptedData);
     } catch (error) {
         console.error('Error in downloadFile: ',error);
         res.status(500).json({error: 'Internal server error'});
@@ -53,10 +56,16 @@ const downloadFile = async (req, res) => {
 // To update the files
 const updateFile = async (req, res) => {
     try {
-        const updatedFile = await File.findByIdAndUpdate(req.params.id, req.body, {new: true});
-        res.status(200).json(updatedFile);
+        const updatedFile = await File.findOneAndUpdate({ _id: req.params.id, owner: req.userId }, req.body, { new: true });
+        if(!updatedFile) {
+            return res.status(404).json({error: 'File not found or unauthorised access'});
+        }
+        const decryptedData = decryptFile(updatedFile.data, process.env.AES_KEY);
+        res.status(200).json({updatedFile, decryptedData});
     } catch (error) {
         console.error('Error in updateFile: ',error);
         req.status(500).json({error: 'Internal server error'});
     }
 };
+
+module.exports = {uploadFile, listFiles, fetchFile, updateFile};

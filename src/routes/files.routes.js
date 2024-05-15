@@ -1,13 +1,14 @@
 const express = require('express');
-const fileController = require('../controllers/file.controller');
-const {  authenticateUser } = require('../utils/auth.util');
+const {uploadFile, listFiles, fetchFile, updateFile} = require('../controllers/file.controller');
+const { authenticateUser } = require('../utils/auth.util');
+const upload = require('../config/multer.config');
 
 const router = express.Router();
 
-router.get('/', authenticateUser, fileController.listFiles);
-router.get('/:id', authenticateUser, fileController.downloadFile);
-router.put('/:id', authenticateUser,  fileController.updateFile);
-router.delete('/:id', authenticateUser, fileController.deleteFile);
+router.post('/',authenticateUser, upload.single('file'), uploadFile);
+router.get('/', authenticateUser, listFiles);
+router.get('/:id', authenticateUser, fetchFile);
+router.put('/:id', authenticateUser,  updateFile);
 
 
 module.exports = router;
