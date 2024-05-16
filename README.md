@@ -12,7 +12,7 @@ FileSafe is a secure file storage application that allows users to upload, store
 ## Architecture Overview
 FileSafe is a web application built using the client-server architecture model. It consists of a frontend, backend, and database components, each serving a specific role in the application.
 
-
+![Screenshot_2024-05-16_14-54-32](https://github.com/prathyushmadhu/FileSafe/assets/99325314/55e5f27c-dd1a-499c-8c23-54fdc5cc3f82)
 
 
 ### Backend
