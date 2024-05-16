@@ -102,7 +102,7 @@ FileSafe uses JSON Web Tokens (JWT) for user authentication. When a user logs in
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/FileSafe.git
+git clone https://github.com/prathyushmadhu/FileSafe.git
 cd FileSafe
 ```
 
