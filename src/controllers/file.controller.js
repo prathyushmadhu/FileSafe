@@ -8,7 +8,7 @@ const uploadFile = async (req, res) => {
             return res.status(400).json({error: "No file uploaded"});
         }
 
-        const encryptedData = encryptFile(req.file.buffer, process.env.AES_KEY);
+        const encryptedData = encryptFile(req.file.buffer,process.env.AES_KEY);
         const userId = req.userId;
         const file = new File({
             filename: req.file.originalname,

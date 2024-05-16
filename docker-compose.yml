@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  filesafe-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - AES_KEY=${AES_KEY}
+    env_file:
+      - .env
